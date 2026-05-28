@@ -1,0 +1,16 @@
+growthbook==2.2.0
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0
+pydantic==2.10.3
+scipy==1.14.1
+numpy==1.26.4
+pandas==2.2.3
+matplotlib==3.9.3
+jupyter==1.1.1
+nbformat==5.10.4
+httpx==0.28.1
+python-dotenv==1.0.1
+pytest==8.3.4

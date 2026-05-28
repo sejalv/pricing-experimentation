@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: growthbook
+      MONGO_INITDB_ROOT_PASSWORD: growthbook
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  growthbook:
+    image: growthbook/growthbook:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"   # App UI
+      - "3100:3100"   # API
+    environment:
+      MONGODB_URI: mongodb://growthbook:growthbook@mongo:27017/growthbook?authSource=admin
+      APP_ORIGIN: http://localhost:3000
+      API_HOST: http://localhost:3100
+      NODE_ENV: production
+      ENCRYPTION_KEY: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
+      JWT_SECRET: s0m3v3ryl0ngrandomjwts3cr3tstring!
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3100/healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: experiment
+      POSTGRES_PASSWORD: experiment
+      POSTGRES_DB: events
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U experiment -d events"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://experiment:experiment@postgres:5432/events
+      GROWTHBOOK_API_URL: http://growthbook:3100
+      GROWTHBOOK_CLIENT_KEY: ${GROWTHBOOK_CLIENT_KEY:-sdk-placeholder}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn src.events.api:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  mongo_data:
+  pg_data:
