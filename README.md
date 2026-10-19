@@ -109,7 +109,7 @@ curl http://localhost:8000/events/summary
 
 `revenue` is stored only for successful conversions; the logger clears it when `converted` is `false`.
 
-## Assign a user in application code
+## Assign a user in application code (optional)
 
 ```python
 from src.assignment.service import assign_user
@@ -123,7 +123,13 @@ Set `GROWTHBOOK_API_URL` and `GROWTHBOOK_CLIENT_KEY` to use the GrowthBook SDK c
 
 ## Analyze results
 
-Open and run [notebooks/experiment_results.ipynb](notebooks/experiment_results.ipynb) after the simulator has populated PostgreSQL. The notebook calculates:
+After the simulator has populated PostgreSQL, launch Jupyter from the project root:
+
+```bash
+python -m jupyter lab
+```
+
+Open the local address printed in the terminal (normally [http://localhost:8888/lab](http://localhost:8888/lab)), then open `notebooks/experiment_results.ipynb` and choose **Run All Cells**. The notebook calculates:
 
 - a two-proportion z-test for conversion rate;
 - a Welch t-test with bootstrap confidence interval for converted-user revenue;
