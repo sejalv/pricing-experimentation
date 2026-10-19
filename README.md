@@ -109,7 +109,7 @@ curl http://localhost:8000/events/summary
 
 `revenue` is stored only for successful conversions; the logger clears it when `converted` is `false`.
 
-## Assign a user in application code
+## Assign a user in application code (optional)
 
 ```python
 from src.assignment.service import assign_user
@@ -126,7 +126,6 @@ Set `GROWTHBOOK_API_URL` and `GROWTHBOOK_CLIENT_KEY` to use the GrowthBook SDK c
 After the simulator has populated PostgreSQL, launch Jupyter from the project root:
 
 ```bash
-source .venv/bin/activate
 python -m jupyter lab
 ```
 
